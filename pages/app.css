@@ -1,0 +1,836 @@
+/* ==========================================================================
+   全局样式
+   --------------------------------------------------------------------------
+   选择「一份全局样式 + 语义化类名」而不是 CSS Modules / Tailwind：
+   - 本项目只有一个页面级布局 + 若干组件，样式总量可控；
+   - 单文件便于集中管理设计变量（颜色/圆角/阴影），避免同一灰色在 8 个文件里各写一遍；
+   - Vike SSR 会在服务端收集 +Layout 引入的 CSS，首屏不会闪一下无样式内容。
+   代价是类名靠约定维护，所以下面按「区块」注释分段，并用 BEM 风格命名。
+   ========================================================================== */
+
+:root {
+  --color-bg: #f4f7fc;
+  --color-surface: #ffffff;
+  --color-text: #101828;
+  --color-muted: #667085;
+  --color-border: #e4e9f2;
+  --color-primary: #2563eb;
+  --color-primary-soft: #eff4ff;
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 12px 28px rgba(16, 24, 40, 0.08);
+
+  --content-width: 860px;
+}
+
+/* --- Reset --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #eaf1fb 0%, var(--color-bg) 320px);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* --- 页面切换进度条（由 body.page-transition 驱动） --- */
+.route-progress {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 20;
+  height: 3px;
+  width: 0;
+  background: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+body.page-transition .route-progress {
+  opacity: 1;
+  animation: route-progress 900ms ease-in-out infinite;
+}
+
+@keyframes route-progress {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 95%;
+  }
+}
+
+/* --- 外框布局 --- */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app__header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app__header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 12px 20px;
+}
+
+.app__main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.app__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 20px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+/* --- Brand --- */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.brand__mark {
+  color: var(--color-primary);
+}
+
+.brand__name {
+  letter-spacing: 0.08em;
+}
+
+/* --- 单位切换 --- */
+.unit-toggle {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+}
+
+.unit-toggle__option {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.unit-toggle__option--active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- 按钮 --- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.button:hover {
+  text-decoration: none;
+  filter: brightness(1.05);
+}
+
+.button--ghost {
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.button--small {
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+/* --- 加载中 --- */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spinner 700ms linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- 首屏 --- */
+.hero {
+  text-align: center;
+  padding: 32px 0 8px;
+}
+
+.hero__title {
+  font-size: 32px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.hero__subtitle {
+  margin: 12px 0 28px;
+  color: var(--color-muted);
+}
+
+.hero__hot-cities {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.hero__hot-cities-label {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.chip {
+  padding: 4px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.chip.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+/* --- 首屏的三个说明卡片 --- */
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.highlight {
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.highlight__title {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.highlight__text {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+/* --- 搜索框 --- */
+.search {
+  position: relative;
+  margin: 0 auto;
+}
+
+.search--hero {
+  max-width: 520px;
+}
+
+.search--compact {
+  max-width: 420px;
+}
+
+.search__field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search__field:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.search--hero .search__field {
+  padding: 0 18px;
+  height: 54px;
+}
+
+.search--compact .search__field {
+  height: 42px;
+}
+
+.search__magnifier {
+  flex-shrink: 0;
+  color: var(--color-muted);
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+}
+
+.search__clear {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.search__clear:hover {
+  background: var(--color-bg);
+}
+
+.search__spinner {
+  flex-shrink: 0;
+}
+
+.search__panel {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  padding: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  text-align: left;
+}
+
+.search__hint,
+.search__feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.search__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.search__option--active {
+  background: var(--color-primary-soft);
+}
+
+.search__option-name {
+  font-weight: 500;
+}
+
+.search__option-region {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+/* --- 天气页 --- */
+.weather-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.weather-page__search {
+  display: flex;
+}
+
+.weather-page__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+/* --- 当前实况 --- */
+.current {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.current--day {
+  background: linear-gradient(140deg, #2f6fe4 0%, #59a5f5 100%);
+}
+
+.current--night {
+  background: linear-gradient(140deg, #1c2a44 0%, #3a4a6b 100%);
+}
+
+.current__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.current__place {
+  font-size: 24px;
+}
+
+.current__region,
+.current__timestamp {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+}
+
+.current__timestamp {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.current__body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0 4px;
+}
+
+.current__temperature {
+  font-size: 60px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.current__summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.current__condition {
+  font-size: 18px;
+}
+
+.current__feels-like {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+/* --- 实况指标 --- */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.metrics__item dt {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.metrics__item dd {
+  font-size: 15px;
+}
+
+/* --- 通用面板 --- */
+.panel {
+  padding: 20px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.panel__title {
+  margin-bottom: 12px;
+  font-size: 15px;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+/* --- 逐时 --- */
+.hourly {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.hourly__item {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 56px;
+  padding: 8px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.hourly__time,
+.hourly__temperature {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.hourly__temperature {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+/* --- 7 天预报 --- */
+.daily__row {
+  display: grid;
+  grid-template-columns: 56px 48px 28px 44px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.daily__row + .daily__row {
+  border-top: 1px solid var(--color-border);
+}
+
+.daily__label {
+  font-weight: 500;
+}
+
+.daily__date,
+.daily__precipitation {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.daily__precipitation {
+  text-align: right;
+}
+
+.daily__range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.daily__low,
+.daily__high {
+  width: 44px;
+  font-size: 14px;
+}
+
+.daily__low {
+  color: var(--color-muted);
+}
+
+.daily__bar {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-bg);
+}
+
+.daily__bar-fill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, #f59e0b);
+}
+
+/* --- 状态：加载/错误/空 --- */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.state__title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.state__message {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+/* --- 图标 --- */
+.weather-icon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.current .weather-icon {
+  color: #fff;
+}
+
+/* --- 错误页 --- */
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 0 0;
+  text-align: center;
+}
+
+.error-page__title {
+  font-size: 24px;
+}
+
+.error-page__text {
+  color: var(--color-muted);
+}
+
+/* --- 响应式 --- */
+@media (max-width: 640px) {
+  .hero__title {
+    font-size: 26px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .daily__row {
+    grid-template-columns: 52px 24px 40px 1fr;
+  }
+
+  .daily__date {
+    display: none;
+  }
+}
+
+/* --- 调试页（/debug，仅开发环境） --- */
+.debug {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.debug__title {
+  margin: 0;
+  font-size: 22px;
+}
+
+.debug__form {
+  display: flex;
+  gap: 10px;
+}
+
+.debug__input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font: inherit;
+  color: inherit;
+}
+
+.debug__button {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.debug__hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.debug__block {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.debug__keyword {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.debug__rewritten {
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.debug__empty {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.debug__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.debug__table th,
+.debug__table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.debug__table th {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+/* 被收敛掉的行：弱化但不隐藏——调试时要看得见「为什么它没被保留」 */
+.debug__row--dropped td {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
